@@ -1,0 +1,25 @@
+2025-09-06 09:31:16,942 INFO root: Starting False Breakout Bot (modular)
+2025-09-06 09:31:20,324 INFO handlers: Exchange warmed
+2025-09-06 09:31:20,325 INFO console: Console started. Type /help
+2025-09-06 15:24:04,758 INFO console: Console stopped.
+2025-09-07 02:15:39,749 INFO root: Starting False Breakout Bot (modular)
+2025-09-07 02:15:40,487 WARNING handlers: Exchange warmup WARNING: bybit {"retCode":10002,"retMsg":"invalid request, please check your server timestamp or recv_window param. req_timestamp[1757200539754],server_timestamp[1757200538641],recv_window[20000]","result":{},"retExtInfo":{},"time":1757200538641}
+2025-09-07 02:15:40,487 INFO console: Console started. Type /help
+2025-09-07 02:52:30,523 INFO scheduler: Scheduler runner started
+2025-09-07 03:34:47,209 INFO root: Starting False Breakout Bot (modular)
+2025-09-07 03:34:47,939 WARNING handlers: Exchange warmup WARNING: bybit {"retCode":10002,"retMsg":"invalid request, please check your server timestamp or recv_window param. req_timestamp[1757205287215],server_timestamp[1757205285986],recv_window[20000]","result":{},"retExtInfo":{},"time":1757205285986}
+2025-09-07 03:34:47,940 INFO console: Console started. Type /help
+2025-09-07 03:39:29,254 INFO console: Console stopped.
+2025-09-07 03:40:40,363 INFO root: Starting False Breakout Bot (modular)
+2025-09-07 03:40:41,020 WARNING handlers: Exchange warmup WARNING: bybit {"retCode":10002,"retMsg":"invalid request, please check your server timestamp or recv_window param. req_timestamp[1757205640369],server_timestamp[1757205639075],recv_window[20000]","result":{},"retExtInfo":{},"time":1757205639075}
+2025-09-07 03:40:41,021 INFO console: Console started. Type /help
+2025-09-07 04:14:05,647 INFO console: Console stopped.
+2025-09-07 04:15:06,116 INFO root: Starting False Breakout Bot (modular)
+2025-09-07 04:16:28,341 INFO root: Starting False Breakout Bot (modular)
+2025-09-07 04:16:29,019 WARNING handlers: Exchange warmup WARNING: bybit {"retCode":10002,"retMsg":"invalid request, please check your server timestamp or recv_window param. req_timestamp[1757207788346],server_timestamp[1757207787026],recv_window[20000]","result":{},"retExtInfo":{},"time":1757207787026}
+2025-09-07 04:16:29,020 INFO console: Console started. Type /help
+2025-09-07 05:10:17,803 INFO console: Console stopped.
+2025-09-07 06:26:01,892 INFO root: Starting False Breakout Bot (modular)
+2025-09-07 06:26:05,394 INFO handlers: Exchange warmed
+2025-09-07 06:26:05,395 INFO console: Console started. Type /help
+2025-09-07 06:32:56,202 INFO console: Console stopped.

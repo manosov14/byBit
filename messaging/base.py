@@ -1,0 +1,16 @@
+
+import abc
+from typing import Awaitable, Callable
+CommandHandler = Callable[[str], Awaitable[None]]
+
+class Messenger(abc.ABC):
+    @abc.abstractmethod
+    async def start(self) -> None: ...
+    @abc.abstractmethod
+    async def stop(self) -> None: ...
+    @abc.abstractmethod
+    async def run_forever(self) -> None: ...
+    @abc.abstractmethod
+    def add_command(self, name: str, handler: CommandHandler, help_text: str = "") -> None: ...
+    @abc.abstractmethod
+    async def send_text(self, text: str) -> None: ...

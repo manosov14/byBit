@@ -24,9 +24,10 @@ def _first_fakeout_in_day(
     atr_series: pd.Series,
 ):
     """
-    Возвращает первую структуру фейкаута в пределах дня:
-      - бар B0 пробил уровень (минимум < level для лонга, максимум > level для шорта)
-      - в пределах max_back H1 баров закрытие вернулось внутрь диапазона (C >= level для лонга, C <= level для шорта)
+    Возвращает описание первого фейкового пробоя внутри дня, удовлетворяющего условиям:
+
+    - бар B0 пробивает уровень (минимум < level для лонга, максимум > level для шорта);
+    - в пределах max_back H1-баров закрытие снова оказывается внутри диапазона (C >= level для лонга, C <= level для шорта).
     """
     if h1_day.empty:
         return None
@@ -67,8 +68,9 @@ def _first_fakeout_in_day(
 
 def _simulate_after_fill(h1_fw: pd.DataFrame, side: str, entry: float, sl: float, tp: float) -> str:
     """
-    После факта входа (entry достигнут ретестом) симулируем до 24 H1:
-    возвращает "TP" | "SL" | "NoFill" (если дальше не было касания TP/SL — маловероятно).
+    После фиксации входа (entry достигнут на ретесте) моделирует развитие событий на следующих 24 барах H1.
+
+    Возвращает строку "TP" | "SL" | "NoFill" (если TP/SL так и не были достигнуты — что маловероятно).
     """
     if h1_fw.empty:
         return "NoFill"
@@ -87,12 +89,13 @@ def _simulate_after_fill(h1_fw: pd.DataFrame, side: str, entry: float, sl: float
 
 def backtest(d1: pd.DataFrame, h4: pd.DataFrame, h1: pd.DataFrame) -> BacktestResult:
     """
-    Бэктест по правилам стратегии:
-    - ≤1 сигнал на день
-    - сторона по D1 (при STRICT_TREND=1 требуем совпадение D1/H4)
-    - фильтры: возврат ≤ N H1, глубина прокола <= MAX_PEN_ATR, опц. ретест ≤ K H1
-    - вход лимиткой на ретесте с допуском ENTRY_OFFSET_ATR_PCT
-    - симуляция исхода на следующих 24 H1
+    Выполняет бэктест согласно правилам стратегии:
+
+    - не более одного сигнала в день;
+    - направление сделки определяется по D1 (если STRICT_TREND=1, то требуется совпадение направлений D1 и H4);
+    - фильтры: возврат не позже чем через N H1-баров, глубина прокола не превышает MAX_PEN_ATR, опционально — ретест не позже K H1;
+    - вход выставляется лимитным ордером на ретесте с допуском ENTRY_OFFSET_ATR_PCT;
+    - исход моделируется на следующих 24 барах H1.
     """
     atr_h1 = _atr(h1, int(settings.ATR_PERIOD_H1))
 
@@ -173,7 +176,7 @@ def backtest(d1: pd.DataFrame, h4: pd.DataFrame, h1: pd.DataFrame) -> BacktestRe
             })
             continue
 
-        # строим уровни входа/сл/тп по тем же правилам, что и в онлайне
+        # строим уровни входа/SL/TP по тем же правилам, что и в онлайне
         levels = SimpleNamespace(prev_high=float(prev["h"]), prev_low=float(prev["l"]))
         sig = plan_trade(tr, levels, h1, {
             "side": side,

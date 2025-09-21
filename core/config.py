@@ -78,6 +78,11 @@ class Settings:
     H1_MAX_PENETRATION_ATR_PCT: float = env_float("H1_MAX_PENETRATION_ATR_PCT", 0.30)
     H1_RETEST_MAX_CANDLES: int = env_int("H1_RETEST_MAX_CANDLES", 4)
 
+    # Пробой в процентах
+    PENETRATION_MIN_PCT: float = env_float("PENETRATION_MIN_PCT", 0.001)
+    PENETRATION_MAX_PCT: float = env_float("PENETRATION_MAX_PCT", 0.007)
+    CLOSE_BACK_MAX_PCT: float = env_float("CLOSE_BACK_MAX_PCT", 0.003)
+
     # ATR / допуски
     ATR_PERIOD_H1: int = env_int("ATR_PERIOD_H1", 14)
     ENTRY_RETEST_TOLERANCE_ATR_PCT: float = env_float("ENTRY_RETEST_TOLERANCE_ATR_PCT", 0.12)
@@ -85,10 +90,24 @@ class Settings:
     STOP_MODE: str = env_str("STOP_MODE", "wick")  # wick | level
     STOP_BUFFER_ATR_PCT: float = env_float("STOP_BUFFER_ATR_PCT", 0.10)
 
+    # Вход и стопы по процентам
+    ENTRY_MODE: str = env_str("ENTRY_MODE", "next_open")
+    ENTRY_UNDERFILL_PCT: float = env_float("ENTRY_UNDERFILL_PCT", 0.001)
+    STOP_WICK_TICKS: int = env_int("STOP_WICK_TICKS", 3)
+    STOP_LEVEL_PCT: float = env_float("STOP_LEVEL_PCT", 0.005)
+
+    # Объёмы / уровни
+    VOLUME_MA_LENGTH: int = env_int("VOLUME_MA_LENGTH", 20)
+    VOLUME_MAX_RATIO: float = env_float("VOLUME_MAX_RATIO", 0.8)
+    LEVEL_LOOKBACK_DAYS: int = env_int("LEVEL_LOOKBACK_DAYS", 10)
+
     # MM / RM
     RR: float = env_float("RR", 3.0)
     RISK_PCT: float = env_float("RISK_PCT", 0.01)
     MAX_CONSECUTIVE_LOSSES: int = env_int("MAX_CONSECUTIVE_LOSSES", 3)
+
+    # Ограничения позиций
+    MAX_OPEN_POSITIONS: int = env_int("MAX_OPEN_POSITIONS", 3)
 
     # Защиты
     ONE_TRADE_PER_DAY: int = env_bool("ONE_TRADE_PER_DAY", 1)

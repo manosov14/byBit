@@ -31,7 +31,7 @@ DEFAULT_TOP = [
     "LTC/USDT:USDT", "MATIC/USDT:USDT", "DOT/USDT:USDT", "SUI/USDT:USDT", "ATOM/USDT:USDT",
 ]
 
-# ----------------- utils -----------------
+# ----------------- утилиты -----------------
 def _load_state() -> dict:
     try:
         with open(STATE_FILE, "r", encoding="utf-8") as f:
@@ -93,7 +93,7 @@ TF_MS = {
 def _fmt_ohlc(r):
     return f"O={float(r['o']):.2f}  H={float(r['h']):.2f}  L={float(r['l']):.2f}  C={float(r['c']):.2f}"
 
-# ----------------- universe helpers -----------------
+# ----------------- помощники для универсума -----------------
 def _build_linear_perp_set(ex: Exchange) -> set:
     try:
         mkts = ex.x.load_markets()
@@ -168,10 +168,10 @@ def _recalc_sl_tp_with_new_rules(
 ) -> Tuple[float, float, float, str]:
     """
     Правило:
-      - если прокол слабый: стоп за прокол на N тиков (STOP_TICKS_BEHIND_PROBE)
-      - если прокол сильный (pen_atr_pct >= STRONG_PEN_THRESHOLD_ATR_PCT):
-            стоп глубиной MAX_STOP_ATR_PCT * ATR от входа
-      - TP по RR
+      - при слабом проколе стоп ставится за экстремум на N тиков (STOP_TICKS_BEHIND_PROBE)
+      - при сильном проколе (pen_atr_pct >= STRONG_PEN_THRESHOLD_ATR_PCT)
+        стоп располагается на расстоянии MAX_STOP_ATR_PCT * ATR от цены входа
+      - тейк-профит выставляется согласно коэффициенту RR
     """
     entry = float(sig["entry"])
     rr = float(settings.RR)
@@ -220,7 +220,7 @@ def _recalc_sl_tp_with_new_rules(
     tp = float(ex.x.price_to_precision(symbol, tp))
     return entry, sl, tp, sl_type
 
-# ----------------- qty (простой риск) -----------------
+# ----------------- размер позиции (простой риск) -----------------
 def _calc_qty_from_risk_linear_usdt(
     ex: Exchange,
     symbol: str,
@@ -240,7 +240,7 @@ def _calc_qty_from_risk_linear_usdt(
         pass
     return max(0.0, qty)
 
-# ----------------- strategy helpers -----------------
+# ----------------- вспомогательные функции стратегии -----------------
 def _reason_if_reject(tr_day: Trend, levels, h1_df, info) -> str | None:
     max_back = int(settings.H1_FALSE_BREAKOUT_MAX_CANDLES)
     if info.get("candles_back") is None or info["candles_back"] > max_back:
@@ -318,7 +318,7 @@ def _detect_today_fakeout_and_signal(d1_df, h4_df, h1_df) -> Tuple[Optional[dict
         return info, None, tr_day, levels, "build signal fail"
     return info, sig, tr_day, levels, None
 
-# ----------------- handlers -----------------
+# ----------------- обработчики -----------------
 def register_handlers(m: Messenger, sched: Scheduler):
     ex = Exchange()
     ex.load()
@@ -349,7 +349,8 @@ def register_handlers(m: Messenger, sched: Scheduler):
             "  /order place ETH/USDT:USDT long entry=2410 sl=2380 tp=2480 risk=0.01",
             "  /order place BTC/USDT:USDT short entry=61250 sl=61600 tp=60000 qty=0.05 post=1 tif=GTC",
             "  /order cancel ETH/USDT:USDT",
-            "  Параметры: qty=<число> | risk=0..1 (или в процентах: 1=1%), post=0|1, tif=GTC|IOC|FOK, tp_mode=limit|market, sl_mode=market|limit",
+            "  Параметры: qty=<число> | risk=0..1 (или в процентах: 1=1%), post=0|1, tif=GTC|IOC|FOK,",
+            "             tp_mode=limit|market, sl_mode=market|limit",
             "  Примечание: если qty и risk не заданы — берётся RISK_PCT из .env (по умолчанию 1% депозита)",
         ]
         await m.send_text("\n".join(lines))
@@ -500,7 +501,7 @@ def register_handlers(m: Messenger, sched: Scheduler):
         except Exception as e:
             await m.send_text(f"Ошибка /days: {e}")
 
-    # --------- scheduler loop ---------
+    # --------- цикл планировщика ---------
     def _make_event_id(symbol: str, info: dict, tr_day: Trend, levels: SimpleNamespace, h1):
         ts = int(h1.loc[info["idx"], "ts"])
         d = datetime.fromtimestamp(ts / 1000, tz=timezone.utc).date().isoformat()

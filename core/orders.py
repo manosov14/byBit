@@ -30,9 +30,9 @@ def _ap(ex: Exchange, symbol: str, amount: float) -> float:
 
 def _norm_risk(x) -> float:
     """
-    Normalize risk value: supports fractions (0.01 = 1%) and percentages (1 = 1%).
-    Any value >= 1 is treated as percent and divided by 100.
-    Clamped to 0..1.
+    Нормализует значение риска: поддерживает доли (0.01 = 1%) и проценты (1 = 1%).
+    Любое значение >= 1 трактуется как процент и делится на 100.
+    Ограничивает результат диапазоном 0..1.
     """
     try:
         v = float(x)
@@ -83,7 +83,7 @@ def _ensure_auth(ex: Exchange) -> bool:
 
 
 def _account_equity_usdt_ccxt(ex: Exchange) -> float:
-    """Primary path: ccxt.fetch_balance(...)."""
+    """Основной путь: ccxt.fetch_balance(...)."""
     bal = {}
     try:
         bal = ex.x.fetch_balance(params=LINEAR_PARAMS) or {}
@@ -110,7 +110,7 @@ def _account_equity_usdt_ccxt(ex: Exchange) -> float:
 
 
 def _account_equity_usdt_v5(ex: Exchange) -> float:
-    """Fallback path: raw Bybit v5 wallet balance (UNIFIED, then CONTRACT)."""
+    """Резервный путь: сырой баланс кошелька Bybit v5 (UNIFIED, затем CONTRACT)."""
     try:
         raw = getattr(ex.x, "privateGetV5AccountWalletBalance", None)
         if raw is None:
@@ -142,10 +142,10 @@ def _account_equity_usdt_v5(ex: Exchange) -> float:
 
 def _account_equity_usdt(ex: Exchange) -> float:
     """
-    Compose equity retrieval:
+    Компонуем получение equity:
       1) ccxt.fetch_balance(params={'category':'linear'})
-      2) raw v5 wallet balance (UNIFIED/CONTRACT)
-      3) EQUITY_FALLBACK_USDT from env (optional)
+      2) сырой баланс кошелька v5 (UNIFIED/CONTRACT)
+      3) EQUITY_FALLBACK_USDT из окружения (опционально)
     """
     eq = _account_equity_usdt_ccxt(ex)
     if eq and eq > 0:
@@ -164,7 +164,7 @@ def _account_equity_usdt(ex: Exchange) -> float:
 
 
 def _get_min_qty(ex: "Exchange", symbol: str) -> float:
-    """Return exchange min lot size for the symbol, or 0.0 if unknown."""
+    """Возвращает минимальный размер лота на бирже для символа или 0.0, если неизвестно."""
     try:
         ex.load()
         m = ex.x.markets.get(symbol) or ex.x.market(symbol)
@@ -185,8 +185,8 @@ def _calc_qty_from_risk_linear_usdt(
     sl: float,
 ) -> float:
     """
-    qty = (risk_frac * balance_usdt) / |entry - sl|, rounded to precision.
-    If qty < exchange min lot and ALLOW_MIN_LOT_OVERRIDE=1 (default) -> bump to min lot.
+    qty = (risk_frac * balance_usdt) / |entry - sl|, округляется по точности биржи.
+    Если qty < минимального лота биржи и ALLOW_MIN_LOT_OVERRIDE=1 (по умолчанию) -> увеличиваем до min lot.
     """
     rf = max(0.0, min(1.0, float(risk_frac or 0.0)))
     risk_usdt = max(0.0, float(balance_usdt) * rf)
@@ -199,7 +199,7 @@ def _calc_qty_from_risk_linear_usdt(
     except Exception:
         pass
 
-    # Enforce min lot if configured
+    # Принудительно применяем min lot, если включено
     try:
         min_qty = _get_min_qty(ex, symbol)
     except Exception:
@@ -212,7 +212,7 @@ def _calc_qty_from_risk_linear_usdt(
 
 
 def cancel_all_for_symbol(ex: Exchange, symbol: str) -> Any:
-    """Cancel ALL active orders for the symbol (including TP/SL)."""
+    """Отменяет ВСЕ активные ордера по символу (включая TP/SL)."""
     _ensure_auth(ex)
     return ex.x.cancel_all_orders(symbol, params=LINEAR_PARAMS)
 
@@ -232,8 +232,8 @@ def place_bracket_order(
     sl_mode: str = "market", # "limit"|"market"
 ) -> Dict[str, Any]:
     """
-    Try to place limit entry with inline TP/SL. If rejected -> fallback to
-    entry limit + separate reduceOnly TP/SL.
+    Пытаемся выставить лимитный вход со встроенными TP/SL. Если отклонено -> переходим к
+    лимиту на вход + отдельным reduceOnly TP/SL.
     """
     try:
         ex.load()
@@ -304,6 +304,7 @@ def place_bracket_order(
 
 async def _cmd_order_impl(messenger, ex: Exchange, args: str):
     """
+    Команды:
     /order place <SYMBOL> <long|short> entry=.. sl=.. tp=.. [qty=.. | risk=..] [post=0|1] [tif=GTC|IOC|FOK] [tp_mode=limit|market] [sl_mode=market|limit]
     /order cancel <SYMBOL>
     """
@@ -422,7 +423,7 @@ async def _cmd_order_impl(messenger, ex: Exchange, args: str):
 
 
 def register_order_commands(messenger, ex: Exchange):
-    """Register /order command in the bot messenger."""
+    """Регистрирует команду /order в мессенджере бота."""
     async def _handler(args: str):
         await _cmd_order_impl(messenger, ex, args)
 
